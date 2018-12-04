@@ -25,6 +25,7 @@ public class OrganizerUserValidator implements Validator {
 
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "login", "", "Field cannot be empty.");
 		
+		System.out.println("VALIDATING: " + u.getLogin());
 		if (userRepo.findByLogin(u.getLogin()) != null) {
 			errors.rejectValue("login", "", "User with that username already exists.");
 		}

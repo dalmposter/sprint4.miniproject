@@ -39,9 +39,19 @@ public class AuthenticationController {
 		OrganizerUser user = userRepo.findByLogin(principal.getName());
 		
 		String view = "redirect:/";
+		
 		//TODO redirect based on the role of user
 		// ADMINs go to "/admin/create"
 		// all others go to "/list"
+		switch(user.getRole().getRole())
+		{
+			case "ADMIN":
+				view += "admin/create";
+				break;
+			default:
+				view += "list";
+				break;
+		}
 
 		return view;
 	}
