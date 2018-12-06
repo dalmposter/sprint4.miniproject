@@ -19,7 +19,7 @@ public class OrganizerApp implements CommandLineRunner  {
 	/**
 	 * An organizer object for everyone to use.
 	 */
-	public static Organizer organizer = new Organizer();
+	//public static Organizer organizer = new Organizer();
 	
 	@Autowired
 	RoleRepository roleRepo;
@@ -57,5 +57,14 @@ public class OrganizerApp implements CommandLineRunner  {
 //		r.setUsers(new HashSet<>());
 //		r.getUsers().add(u);
 		userRepo.save(u);
+		
+		/*
+		u = new OrganizerUser();
+		
+		u.setLogin("manager");
+		u.setPassword(pe.encode("manager"));
+		u.setRole(roleRepo.findById(1));
+		userRepo.save(u);
+		*/
 	}
 }

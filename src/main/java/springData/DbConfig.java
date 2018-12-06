@@ -23,13 +23,13 @@ public class DbConfig {
 	private String PASSWORD = "Shah1eef"; // in ~/.my.cnf
 	
 	// from campus
-	private String HOST = "mysql.mcscw3.le.ac.uk";
-	private int PORT = 3306;
+	//private String HOST = "mysql.mcscw3.le.ac.uk";
+	//private int PORT = 3306;
 	
 	// off-campus: after executing 
 	// ssh -fNg -L 3307:mysql.mcscw3.le.ac.uk:3306 abc123@xanthus.mcscw3.le.ac.uk
-	//private String HOST = "127.0.0.1";
-	//private int PORT = 3307;
+	private String HOST = "127.0.0.1";
+	private int PORT = 3307;
 				
     @Bean
     public DriverManagerDataSource dataSource() {

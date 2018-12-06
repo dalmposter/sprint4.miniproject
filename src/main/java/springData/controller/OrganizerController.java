@@ -1,7 +1,12 @@
 package springData.controller;
 
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -13,12 +18,26 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import springData.OrganizerApp;
+import springData.domain.Organizer;
+import springData.domain.OrganizerUser;
 import springData.domain.Todo;
+import springData.repository.OrganizerRepository;
+import springData.repository.TodoRepository;
+import springData.repository.UserRepository;
 
 @Controller
 @RequestMapping("/")
 public class OrganizerController {
 
+	@Autowired
+	UserRepository userRepo;
+	
+	@Autowired
+	TodoRepository todoRepo;
+	
+	@Autowired
+	OrganizerRepository orgRepo;
+	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 		binder.addValidators(new TodoValidator());
@@ -31,11 +50,28 @@ public class OrganizerController {
 	}
 
 	@RequestMapping(value = "create", params = "add", method = RequestMethod.POST)
-	public String addNewTodo(@Valid @ModelAttribute("todo") Todo t, BindingResult result, Model model) {
+	public String addNewTodo(@Valid @ModelAttribute("todo") Todo t, BindingResult result, Model model, Principal principal) {
 		if (result.hasErrors()) {
 			return "CreateTodo";
 		} else {
-			OrganizerApp.organizer.addTodo(t);
+			
+			OrganizerUser user = userRepo.findByLogin(principal.getName());
+			List<Organizer> orgs = user.getOrganizers();
+			Organizer theOne;
+			
+			if(orgs == null || orgs.isEmpty())
+			{
+				theOne = new Organizer();
+				theOne.setOwner(user);
+				orgs = new ArrayList<>();
+				orgs.add(theOne);
+				user.setOrganizers(orgs);
+			}
+			else theOne = orgs.get(0);
+			
+			theOne.addTodo(t);
+			userRepo.save(user);
+			
 			return "redirect:/list";
 		}
 	}
@@ -46,8 +82,16 @@ public class OrganizerController {
 	}
 
 	@RequestMapping(value = "delete", params = "id", method = RequestMethod.GET)
-	public String deleteTodo(@RequestParam("id") int id) {
-		OrganizerApp.organizer.deleteTodo(id);
+	public String deleteTodo(@RequestParam("id") int id, Principal principal) {
+		
+		OrganizerUser user = userRepo.findByLogin(principal.getName());
+		
+		user.getOrganizers().forEach( o -> o.deleteTodo(id));
+		
+		todoRepo.deleteById(id);
+		userRepo.save(user);
+		
+		//OrganizerApp.organizer.deleteTodo(id);
 		return "redirect:/list";
 	}
 }
